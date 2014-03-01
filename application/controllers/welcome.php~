@@ -1,0 +1,49 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+class Welcome extends CI_Controller {
+
+	/*Since this controller is set as the default controller in config/routes.php */
+	public function index()
+	{
+		
+		$entered=$this->login->enter();
+		
+		$view_data['add_scripts']=array();	//підключ. js унікальний для цієї сторінки 
+		echo "дійшов!!!"
+		$this->load->view('navigation/header',$view_data);	
+		
+		if($entered){
+			$this->load->model(array('MyTasks','Log','ctrl'));		
+			
+			$view['max_log']=$this->ctrl->constDB('main_max_log');
+			
+			$my_tasks=$this->MyTasks->dataForTab($_SESSION['user_id']);
+			if(is_array($my_tasks))
+				$view=array_merge($view,$my_tasks);	
+			$log = $this->Log->sort = 1;		
+			$view['log']=$this->Log->getEventsStr(-1,NULL,NULL,$view['max_log']);
+			/*echo "<pre>";
+print_r($view['log']);
+echo "</pre>";	*/
+			$this->load->view('main_page/welcome_page',$view);
+		}else{	
+		echo "тут!";			
+			$this->load->view('main_page/login_page');				
+		}
+		$this->load->view('navigation/footer');
+	}
+	
+	public function logout()
+	{
+		$this->login->logout();
+	}
+	
+	
+	public function enter_form()
+	{
+		echo $this->login->enter();
+	}
+}
+
+/* End of file welcome.php */
+/* Location: ./application/controllers/welcome.php */
