@@ -11,7 +11,6 @@ class Welcome extends CI_Controller {
 		$view_data['add_scripts']=array();	//підключ. js унікальний для цієї сторінки 
 		
 		$this->load->view('navigation/header',$view_data);	
-		
 		if($entered){
 			//echo "секретна сторінка!!!";
 			$this->load->model('product');
@@ -26,8 +25,9 @@ class Welcome extends CI_Controller {
 				print_r($attr);
 			echo "</pre>";		
 		}else{						
-			$this->load->view('main_page/login_page');				
+			//$this->load->view('main_page/login_page');				
 		}
+		$this->load->view('main_page/welcome_page');
 		$this->load->view('navigation/footer');
 	}
 	

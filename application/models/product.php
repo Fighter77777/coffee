@@ -126,7 +126,7 @@ class Product extends CI_Model{
 	public function attributesList()
 	{
 		$where=$this->queryWere(1);
-		$query_txt="SELECT atributes.name, values_atributes.id, values_atributes.value
+		$query_txt="SELECT atributes.id `attr_id`, atributes.name, values_atributes.id, values_atributes.value
 						  FROM products, products_has_values_atributes, values_atributes, atributes
 						  WHERE products.id = products_has_values_atributes.products_id
 						   AND products_has_values_atributes.values_atributes_id = values_atributes.id
@@ -154,6 +154,15 @@ class Product extends CI_Model{
 		//$this->were['cat_id']=$category_id;
 		//$this->were['prod_display']='no_del';
 		$attr=$this->attributesList();
-		return $attr;		
+		$old_tp_attr=NULL;
+		$num_attr=count($attr);		
+		for($i=0;$i<$num_attr;$i++)	{
+			if($i==0 || $old_tp_attr!=$attr[$i]['attr_id'])
+				$r[$attr[$i]['attr_id']]=array('nm'=>$attr[$i]['name'],'val'=>array($attr[$i]['value']));		
+			else
+				$r[$attr[$i]['attr_id']]['val'][]=$attr[$i]['value'];	
+			$old_tp_attr=$attr[$i]['attr_id'];	
+		}	
+		return $r;		
 	}
 }
