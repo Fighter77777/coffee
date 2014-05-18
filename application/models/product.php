@@ -1,35 +1,35 @@
 <?php 
 class Product extends CI_Model{
-	public $were;
+	public $where;
 	public $sort;
 	public $limit;
 	
 	
-	private function queryWere($only_condition=NULL)
+	private function queryWhere($only_condition=NULL)
 	{
-		$were_db=array();
-		if(!empty($this->were['cat_id']))
-			$were_db['categorys.id']='products.category_id='.(int)$this->were['cat_id'];
-		if(!empty($this->were['pr_id']))
-			$were_db['pr_id']='products.id='.(int)$this->were['pr_id'];
-		if(!empty($this->were['attr_nm_id']))
-			$were_db['atributes.id']='atributes.id='.(int)$this->were['attr_nm_id'];
-	/*	if(isset($this->were['attr_val_id'])){
-			if(is_array($this->were['attr_val_id'])){}
-			$were_db['values_atributes.id']=(int)$this->were['attr_val_id'];
+		$where_db=array();
+		if(!empty($this->where['cat_id']))
+			$where_db['categorys.id']='products.category_id='.(int)$this->where['cat_id'];
+		if(!empty($this->where['pr_id']))
+			$where_db['pr_id']='products.id='.(int)$this->where['pr_id'];
+		if(!empty($this->where['attr_nm_id']))
+			$where_db['atributes.id']='atributes.id='.(int)$this->where['attr_nm_id'];
+	/*	if(isset($this->where['attr_val_id'])){
+			if(is_array($this->where['attr_val_id'])){}
+			$where_db['values_atributes.id']=(int)$this->where['attr_val_id'];
 		}*/
-		if(!empty($this->were['prod_display']))
-			if($this->were['prod_display']=='no_del')
-				$were_db['products.display']='products.display<>del';	
+		if(!empty($this->where['prod_display']))
+			if($this->where['prod_display']=='no_del')
+				$where_db['products.display']='products.display<>del';	
 			else
-				$were_db['products.display']='products.display='.(int)$this->were['prod_display'];		
-		if(!empty($were_db)){
-			$were_txt=implode (' AND ', $were_db); 
+				$where_db['products.display']='products.display='.(int)$this->where['prod_display'];		
+		if(!empty($where_db)){
+			$where_txt=implode (' AND ', $where_db); 
 			if(!$only_condition)
-				$were_txt=' WHERE '.$were_txt;
+				$where_txt=' WHERE '.$where_txt;
 			else
-				$were_txt=' AND '.$were_txt;
-			return $were_txt;
+				$where_txt=' AND '.$where_txt;
+			return $where_txt;
 		}
 	}
 	
@@ -63,12 +63,13 @@ class Product extends CI_Model{
 	
 	private function queryProducts()
 	{
-		$where=$this->queryWere();
+		$where=$this->querywhere();
 		$order=$this->queryOrder();	
 		$limit=$this->queryLimit();
 		$query_txt="SELECT
-					  categorys.name cat_nm, products.id pr_id, products.name pr_nm, products.description pr_descr, products.price, products.display, images.name img,
-					  atributes.name attr_nm, values_atributes.value attr_val,
+					  categorys.name cat_nm, products.id pr_id, products.name pr_nm, products.description pr_descr, 
+					  products.price, products.display, products.num pr_num, images.name img,
+					  atributes.id attr_id, atributes.name attr_nm, values_atributes.value attr_val,
 					  discount_quantity.name discount_name, discount_quantity.quantity, discount_quantity.min_level, discount_quantity.rate  
 					FROM products
 					  INNER JOIN categorys
@@ -125,7 +126,7 @@ class Product extends CI_Model{
 	
 	public function attributesList()
 	{
-		$where=$this->queryWere(1);
+		$where=$this->queryWhere(1);
 		$query_txt="SELECT atributes.id `attr_id`, atributes.name, values_atributes.id, values_atributes.value
 						  FROM products, products_has_values_atributes, values_atributes, atributes
 						  WHERE products.id = products_has_values_atributes.products_id
@@ -142,8 +143,8 @@ class Product extends CI_Model{
 	
 	public function categoryProducts($category_id=NULL)
 	{
-		$this->were['cat_id']=$category_id;
-		$this->were['prod_display']='no_del';
+		$this->where['cat_id']=$category_id;
+		$this->where['prod_display']='no_del';
 		$this->sort['price']='asc';
 		$prod=$this->arrProducts();
 		return $prod;		
@@ -151,8 +152,8 @@ class Product extends CI_Model{
 	
 	public function attributesProducts($category_id=NULL)
 	{
-		//$this->were['cat_id']=$category_id;
-		//$this->were['prod_display']='no_del';
+		//$this->where['cat_id']=$category_id;
+		//$this->where['prod_display']='no_del';
 		$attr=$this->attributesList();
 		$old_tp_attr=NULL;
 		$num_attr=count($attr);		
@@ -164,5 +165,22 @@ class Product extends CI_Model{
 			$old_tp_attr=$attr[$i]['attr_id'];	
 		}	
 		return $r;		
+	}
+	
+	
+	public function getProduct($pr_id=NULL)
+	{
+		if($pr_id>0){
+			$this->where['pr_id']=$pr_id;
+			//$this->sort['price']='asc';
+			$prod=$this->queryProducts();
+			if($prod){
+				foreach($prod as $p)
+					$attr[$p['attr_id']]=array('nm'=>$p['attr_nm'], 'val'=>$p['attr_val']);	
+				$pr=$prod[0];
+				unset($pr['attr_id']); unset($pr['attr_nm']); unset($pr['attr_val']);
+			}
+			return array('prod'=>$pr, 'attr'=>$attr);
+		}		
 	}
 }

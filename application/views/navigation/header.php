@@ -10,6 +10,7 @@
   
   <!-- Stylesheets -->
   <link rel="stylesheet" href="<?php echo base_url(); ?>css/style.css" />
+  <link rel="stylesheet" href="<?php echo base_url(); ?>css/reset.css" />
   <link rel="stylesheet" href="<?php echo base_url(); ?>css/custom-theme/jquery-ui-1.10.4.custom.min.css" />
   <!--[if lt IE 9]> 
    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script> 
@@ -30,6 +31,9 @@
     <?php 	endforeach;
 		  endif;?>
     <!-- end of scripts -->   
+    
+   <!-- <link rel="stylesheet" href="http://yui.yahooapis.com/2.9.0/build/reset/reset-min.css">-->
+   <!-- <link rel="stylesheet" href="<?php echo site_url() ?>css/stylesheet.css">-->
 </head>
 
 <body>
