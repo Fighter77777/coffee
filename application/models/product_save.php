@@ -3,6 +3,10 @@ class Product_save extends CI_Model{
 	
 	public function save($post=NULL,$pr_id=NULL)
 	{
+		echo '<pre>';
+			print_r($post);
+		echo '</pre><hr>';
+			
 		$product_arr=array(
 		  'name'=>$post['pr_nm'],
 		  'description'=>$post['pr_descr'],
@@ -17,7 +21,7 @@ class Product_save extends CI_Model{
 		if($pr_id>0){
 			$this->db->update('products', $product_arr,array('id' => $pr_id)); 
 			
-			$del_attr_val ="DELETE values_atributes
+		echo	$del_attr_val ="DELETE values_atributes
 							FROM values_atributes 
 							  INNER JOIN products_has_values_atributes
 							    ON products_has_values_atributes.values_atributes_id = values_atributes.id
@@ -32,11 +36,14 @@ class Product_save extends CI_Model{
 			$pr_id=$this->db->insert_id();	
 		}
 
-		if(!empty($post['attr_val'][1]))
+		if(!empty($post['attr_val'][1]))	//input
 			foreach($post['attr_val'][1] as $k=>$v)
 				$ins_pr_attr[]=array('products_id'=>$pr_id, 'values_atributes_id'=>$v);	
 		
-		if(!empty($post['attr_val'][0])){
+		echo '<pre>';
+			print_r($ins_pr_attr);
+		echo '</pre>';
+		if(isset($post['attr_val'][0]) && is_array($post['attr_val'][0])){	//select
 			foreach($post['attr_val'][0] as $k=>$v){
 				$ins_val_attr[]=array('atributes_id'=>$k, 'value'=>$v);	
 				$this->db->insert('values_atributes',$ins_val_attr); 
@@ -45,8 +52,11 @@ class Product_save extends CI_Model{
 				$ins_pr_attr[]=array('products_id'=>$pr_id, 'values_atributes_id'=>$val_attr_id);	
 			}
 		}
-		if(!empty($ins_pr_attr))
-			$this->db->insert_batch('products_has_values_atributes',$ins_pr_attr); 
+		echo '<pre>';
+			print_r($ins_pr_attr);
+		echo '</pre>';
+		/*if(!empty($ins_pr_attr))
+			$this->db->insert_batch('products_has_values_atributes',$ins_pr_attr); */
 				
 	}
 }
